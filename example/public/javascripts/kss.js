@@ -2,25 +2,27 @@
   var KssStateGenerator;
   KssStateGenerator = (function() {
     function KssStateGenerator() {
-      var idx, idxs, pseudos, replaceRule, rule, stylesheet, _i, _len, _len2, _ref, _ref2;
-      pseudos = /(\:hover|\:disabled|\:active|\:visited)/g;
+      var idx, pseudos, replaceRule, rule, stylesheet, _i, _len, _len2, _ref, _ref2;
+      pseudos = /\:(hover|disabled|active|visited|focus)/g;
+      replaceRule = function(matched, stuff) {
+        return ".pseudo-class-" + matched.replace(':', '');
+      };
       try {
         _ref = document.styleSheets;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           stylesheet = _ref[_i];
-          idxs = [];
           _ref2 = stylesheet.cssRules;
           for (idx = 0, _len2 = _ref2.length; idx < _len2; idx++) {
             rule = _ref2[idx];
             if ((rule.type === CSSRule.STYLE_RULE) && pseudos.test(rule.selectorText)) {
-              replaceRule = function(matched, stuff) {
-                return ".pseudo-class-" + matched.replace(':', '');
-              };
               this.insertRule(rule.cssText.replace(pseudos, replaceRule));
             }
+            pseudos.test(); // forcefully reset regex
           }
         }
-      } catch (_e) {}
+      } catch (_e) {
+        console.error(_e);
+      }
     }
     KssStateGenerator.prototype.insertRule = function(rule) {
       var headEl, styleEl;
